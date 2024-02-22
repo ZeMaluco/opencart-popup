@@ -1,0 +1,106 @@
+{{ header }}
+<!-- Check if any popup is active  -->
+{% if popups %}
+
+<!-- Styles for the popup(custom background is added in styles of element)  -->
+<style type="text/css">
+    .overlay-popup { position: fixed; top: 0; left: 0; bottom: 0; right: 0; width: 100%; height: 100%; background-color: #000; opacity: 0.7; z-index: 100; display: none; } 
+    .popup{ width: 100%; display: none; position: absolute; z-index: 101; top: 10vh; } 
+    .popup-innerbox{ width: 50%; min-height: 25%; margin: 12% auto; background: #ffffff; padding: 10px 15px; border-radius: 4px; box-shadow: 0 2px 5px #000000; } 
+    .popup-innerbox h3 { margin:0px; } 
+    .popup-innerbox hr { margin: 10px 0px 10px 0px; } 
+    .popup-innerbox-inner{ color: #111111; font-size: 15px; text-align: justify; padding: 20px; } 
+    .close-popup{ text-align: right; } 
+    .close-popup a{ color: #000000; text-decoration: none; } 
+    #dont_show_again{ padding: 20px; font-size: 13px; } 
+    #dont_show_again_c{ margin-right: 8px; } 
+</style>
+<!-- Scripts for opening the popup, setting and checking cookie and closing  -->
+<script type='text/javascript'>
+
+    $(document).ready(function() {
+        // check if cookie exist's
+        checkCookie(); 
+    }) 
+    $(function(){
+        $('.close').on('click', function () {
+            $('#dont_show_again_c:checkbox:checked').each(function(){
+                if($(this).val() == 'yes') {
+                    // if user doens't want to see the popup anymore set a cookie
+                    setCookie('popupcookie','valuepopupkcookie'); 
+                } 
+            }); 
+            $('.popup1').fadeOut(); 
+            $('.overlay-popup1').appendTo(document.body).remove();
+            return false; 
+        }); 
+    });
+
+    function setCookie(cname, cvalue) {
+        // since now chorme and other broswers don't support cookies longer than a year, the expires value will be set to a year 
+        let expires = "expires=expires=Fri, 31 Dec 9999 23:59:59 GMT";
+        document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+    }
+
+    function getCookie(cname) {
+        // tries to get the cookie if exists returns the length if not returns empty
+        let name = cname + "=";
+        let decodedCookie = decodeURIComponent(document.cookie);
+        let ca = decodedCookie.split(';');
+        for(let i = 0; i < ca.length; i++) {
+            let c = ca[i]; 
+            while (c.charAt(0) == ' ') {
+                c = c.substring(1); 
+            } 
+            if (c.indexOf(name) == 0) {
+                return c.substring(name.length, c.length); 
+            } 
+        } 
+        return ""; 
+    }
+
+    function checkCookie() {
+        // check if cookie is present if not show popup 
+        let smartpopupkcookie = getCookie("popupcookie");
+        if (smartpopupkcookie == "") {
+            $('.overlay-popup1').show();
+            $('.overlay-popup1').appendTo(document.body);
+            $('.popup1').fadeIn(2000);
+            $('.popup-innerbox-inner').html(function() {
+                return $(this).text(); // Interpret HTML content
+            });     
+        }
+    } 
+</script>
+<!-- HTML for popup, for runs each popup if theres more than one -->
+  {% for popup in popups %}
+    <div class='popup1' >
+    <!-- background color set in backoffice  --> 
+      <div class='popup-innerbox' style="background:{{popup.backgroundcolor}}"> 
+        <div class="close-popup">
+          <a href='' class='close'>X</a>
+        </div>
+        <!-- content set in backoffice  --> 
+        <div class='popup-innerbox-inner'> {{ popup.value }} </div>
+        <!-- this text can be change to a var that will be present on language folder dontshowagain for example --> 
+        <div id="dont_show_again"><input type="checkbox" name="dont_show_again_c" id="dont_show_again_c" value="yes">Não mostrar novamente</div>
+      </div> 
+    </div>
+  {% endfor %}
+<!-- overlay for the popup -->
+  <div class="overlay-popup1"></div>
+{% endif %}
+   
+<div class="container">
+  <div class="row">{{ column_left }}
+    {% if column_left and column_right %}
+    {% set class = 'col-sm-6' %}
+    {% elseif column_left or column_right %}
+    {% set class = 'col-md-9 col-sm-8' %}
+    {% else %}
+    {% set class = 'col-sm-12' %}
+    {% endif %}
+    <div id="content" class="{{ class }}">{{ content_top }}{{ content_bottom }}</div>
+    {{ column_right }}</div>
+</div>
+{{ footer }}
