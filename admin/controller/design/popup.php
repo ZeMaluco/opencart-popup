@@ -2,6 +2,7 @@
 class ControllerDesignPopup extends Controller {
 	private $error = array();
 
+	// load page 
 	public function index() {
 		$this->load->language('design/popup');
 
